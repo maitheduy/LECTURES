@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Bài giảng HTML</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .storage-info {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .storage-info button {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+            margin: 0 5px;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .filter-section {
+            margin-bottom: 25px;
+        }
+
+        .filter-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #ecf0f1;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .filter-option.active {
+            background: #3498db;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .category-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .category-item.active {
+            background: #3498db;
+        }
+
+        .category-item i {
+            font-size: 1.1rem;
+        }
+
+        .category-count {
+            margin-left: auto;
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .category-delete {
+            position: absolute;
+            right: 10px;
+            background: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 0.7rem;
+        }
+
+        .category-item:hover .category-delete {
+            opacity: 1;
+        }
+
+        .main-content {
+            padding: 30px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .content-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .samples-count {
+            background: #3498db;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .samples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .sample-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #3498db;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .sample-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .sample-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .sample-name {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .sample-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sample-action {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sample-action:hover {
+            background: #ecf0f1;
+            color: #3498db;
+        }
+
+        .sample-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .sample-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sample-description {
+            color: #5a6c7d;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        .sample-link {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sample-link:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+        }
+
+        .sample-link.disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .sample-link.disabled:hover {
+            transform: none;
+            background: #95a5a6;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sample-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Floating Action Button */
+        .fab-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .fab-main {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e74c3c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .fab-main:hover {
+            transform: scale(1.1);
+            background: #c0392b;
+        }
+
+        .fab-options {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .fab-option {
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .fab-option:hover {
+            background: #2980b9;
+            transform: translateX(-5px);
+        }
+
+        .fab-options.show {
+            display: flex;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .content-preview {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+            
+            .samples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .fab-options {
+                right: auto;
+                left: 0;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+        }
+
+        .tag {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .tag-link {
+            background: #27ae60;
+        }
+
+        .sample-tags {
+            margin-bottom: 15px;
+        }
+
+        /* New styles for lesson management */
+        .lesson-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .lesson-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .image-upload-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .image-upload-btn:hover {
+            background: #2980b9;
+        }
+
+        .hierarchy-level {
+            margin-left: 15px;
+            font-size: 0.9rem;
+            color: #ecf0f1;
+        }
+
+        .hierarchy-level-1 {
+            margin-left: 0;
+            font-weight: bold;
+        }
+
+        .hierarchy-level-2 {
+            margin-left: 15px;
+        }
+
+        .hierarchy-level-3 {
+            margin-left: 30px;
+            font-style: italic;
+        }
+
+        .chapter-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .chapter-item {
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chapter-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .chapter-item.active {
+            background: #3498db;
+        }
+
+        .topic-list {
+            list-style: none;
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        .topic-item {
+            padding: 8px 12px;
+            margin-bottom: 3px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .topic-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .topic-item.active {
+            background: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-book"></i> Quản lý Bài giảng HTML</h1>
+            <p>Quản lý và tổ chức các bài giảng HTML theo mục, chương và chủ đề</p>
+            <div class="storage-info">
+                Dữ liệu được lưu trữ cục bộ • 
+                <button onclick="exportData()">Xuất dữ liệu</button> • 
+                <button onclick="importData()">Nhập dữ liệu</button> • 
+                <button onclick="showStorageInfo()">Thông tin lưu trữ</button>
+            </div>
+        </div>
+
+        <div class="app-container">
+            <div class="sidebar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm bài giảng...">
+                </div>
+
+                <div class="filter-section">
+                    <h3><i class="fas fa-filter"></i> Lọc theo loại</h3>
+                    <div class="filter-options">
+                        <div class="filter-option active" data-type="all">
+                            <i class="fas fa-th-large"></i>
+                            <span>Tất cả bài giảng</span>
+                        </div>
+                        <div class="filter-option" data-type="html">
+                            <i class="fab fa-html5"></i>
+                            <span>HTML/CSS</span>
+                        </div>
+                        <div class="filter-option" data-type="javascript">
+                            <i class="fab fa-js"></i>
+                            <span>JavaScript</span>
+                        </div>
+                        <div class="filter-option" data-type="project">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>Dự án</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <h3><i class="fas fa-sitemap"></i> Cấu trúc bài giảng</h3>
+                    <ul class="category-list" id="categoryList">
+                        <!-- Categories will be populated by JavaScript -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="content-header">
+                    <h2 class="content-title" id="currentCategory">
+                        <i class="fas fa-th-large"></i> 
+                        <span id="categoryName">Tất cả bài giảng</span>
+                        <span class="samples-count" id="samplesCount">0</span>
+                    </h2>
+                </div>
+
+                <div class="samples-grid" id="samplesGrid">
+                    <!-- Lesson cards will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <div class="fab-options" id="fabOptions">
+            <div class="fab-option" onclick="showAddCategoryModal()">
+                <i class="fas fa-folder-plus"></i>
+                <span>Thêm mục mới</span>
+            </div>
+            <div class="fab-option" onclick="showAddChapterModal()">
+                <i class="fas fa-folder-plus"></i>
+                <span>Thêm chương mới</span>
+            </div>
+            <div class="fab-option" onclick="showAddTopicModal()">
+                <i class="fas fa-file-plus"></i>
+                <span>Thêm chủ đề mới</span>
+            </div>
+            <div class="fab-option" onclick="showAddLessonModal()">
+                <i class="fas fa-plus-circle"></i>
+                <span>Thêm bài giảng mới</span>
+            </div>
+        </div>
+        <div class="fab-main" id="fabMain">
+            <i class="fas fa-plus"></i>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal" id="addCategoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thêm mục mới</h3>
+                <button class="close-btn" onclick="hideAddCategoryModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="categoryNameInput">Tên mục</label>
+                <input type="text" id="categoryNameInput" placeholder="Nhập tên mục...">
+            </div>
+            <div class="form-group">
+                <label for="categoryDescriptionInput">Mô tả</label>
+                <textarea id="categoryDescriptionInput" placeholder="Mô tả ngắn về mục..."></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideAddCategoryModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="addNewCategory()">Thêm mục</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Chapter Modal -->
+    <div class="modal" id="addChapterModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thêm chương mới</h3>
+                <button class="close-btn" onclick="hideAddChapterModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="chapterNameInput">Tên chương</label>
+                <input type="text" id="chapterNameInput" placeholder="Nhập tên chương...">
+            </div>
+            <div class="form-group">
+                <label for="chapterCategorySelect">Thuộc mục</label>
+                <select id="chapterCategorySelect">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="chapterDescriptionInput">Mô tả</label>
+                <textarea id="chapterDescriptionInput" placeholder="Mô tả ngắn về chương..."></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideAddChapterModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="addNewChapter()">Thêm chương</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Topic Modal -->
+    <div class="modal" id="addTopicModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thêm chủ đề mới</h3>
+                <button class="close-btn" onclick="hideAddTopicModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="topicNameInput">Tên chủ đề</label>
+                <input type="text" id="topicNameInput" placeholder="Nhập tên chủ đề...">
+            </div>
+            <div class="form-group">
+                <label for="topicChapterSelect">Thuộc chương</label>
+                <select id="topicChapterSelect">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="topicDescriptionInput">Mô tả</label>
+                <textarea id="topicDescriptionInput" placeholder="Mô tả ngắn về chủ đề..."></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideAddTopicModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="addNewTopic()">Thêm chủ đề</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Lesson Modal -->
+    <div class="modal" id="lessonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="lessonModalTitle">Thêm bài giảng mới</h3>
+                <button class="close-btn" onclick="hideLessonModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="lessonNameInput">Tên bài giảng *</label>
+                <input type="text" id="lessonNameInput" placeholder="Nhập tên bài giảng...">
+            </div>
+            <div class="form-group">
+                <label for="lessonTopicSelect">Chủ đề *</label>
+                <select id="lessonTopicSelect">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="lessonDescriptionInput">Mô tả</label>
+                <textarea id="lessonDescriptionInput" placeholder="Mô tả ngắn về bài giảng..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="lessonLinkInput">Đường link bài giảng *</label>
+                <input type="url" id="lessonLinkInput" placeholder="https://example.com/...">
+                <div class="help-text">Dán đường link đến bài giảng HTML hoặc trang web</div>
+            </div>
+            <div class="form-group">
+                <label>Hình ảnh bài giảng</label>
+                <div class="lesson-image" id="lessonImagePreview">
+                    <span>Chưa có hình ảnh</span>
+                </div>
+                <input type="file" id="lessonImageInput" accept="image/*" style="display: none;">
+                <button class="image-upload-btn" onclick="document.getElementById('lessonImageInput').click()">
+                    <i class="fas fa-upload"></i> Tải lên hình ảnh
+                </button>
+                <div class="help-text">Hoặc nhập URL hình ảnh bên dưới</div>
+            </div>
+            <div class="form-group">
+                <label for="lessonImageUrlInput">URL hình ảnh</label>
+                <input type="url" id="lessonImageUrlInput" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideLessonModal()">Hủy</button>
+                <button class="btn btn-primary" id="saveLessonBtn" onclick="saveLesson()">Thêm bài giảng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Lesson Modal -->
+    <div class="modal" id="viewLessonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewLessonTitle">Xem bài giảng</h3>
+                <button class="close-btn" onclick="hideViewLessonModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Hình ảnh</label>
+                <div class="lesson-image" id="viewLessonImage">
+                    <span>Không có hình ảnh</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tên bài giảng</label>
+                <div class="content-preview" id="viewLessonName"></div>
+            </div>
+            <div class="form-group">
+                <label>Chủ đề</label>
+                <div class="content-preview" id="viewLessonTopic"></div>
+            </div>
+            <div class="form-group">
+                <label>Mô tả</label>
+                <div class="content-preview" id="viewLessonDescription"></div>
+            </div>
+            <div class="form-group">
+                <label>Đường link</label>
+                <div class="content-preview" id="viewLessonLink"></div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideViewLessonModal()">Đóng</button>
+                <button class="btn btn-success" onclick="openLessonLink()">Mở bài giảng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Data Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nhập dữ liệu</h3>
+                <button class="close-btn" onclick="hideImportModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="importDataInput">Dán dữ liệu JSON vào đây</label>
+                <textarea id="importDataInput" placeholder='{"categories": [...], "chapters": [...], "topics": [...], "lessons": [...]}' style="min-height: 200px;"></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideImportModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="processImport()">Nhập dữ liệu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Storage keys
+        const STORAGE_KEYS = {
+            CATEGORIES: 'lesson_categories',
+            CHAPTERS: 'lesson_chapters',
+            TOPICS: 'lesson_topics',
+            LESSONS: 'lesson_lessons'
+        };
+
+        // Default data
+        const defaultCategories = [
+            { id: 'all', name: 'Tất cả bài giảng', icon: 'fas fa-th-large', count: 0 },
+            { id: 'html-basics', name: 'HTML Cơ bản', icon: 'fab fa-html5', count: 0 },
+            { id: 'css-styling', name: 'CSS & Styling', icon: 'fab fa-css3-alt', count: 0 },
+            { id: 'js-fundamentals', name: 'JavaScript Cơ bản', icon: 'fab fa-js', count: 0 }
+        ];
+
+        const defaultChapters = [
+            {
+                id: 'html-intro',
+                name: 'Giới thiệu HTML',
+                category: 'html-basics',
+                description: 'Tổng quan về HTML và các thẻ cơ bản'
+            },
+            {
+                id: 'css-intro',
+                name: 'Giới thiệu CSS',
+                category: 'css-styling',
+                description: 'Tổng quan về CSS và cách áp dụng style'
+            },
+            {
+                id: 'js-syntax',
+                name: 'Cú pháp JavaScript',
+                category: 'js-fundamentals',
+                description: 'Cú pháp cơ bản và các khái niệm trong JavaScript'
+            }
+        ];
+
+        const defaultTopics = [
+            {
+                id: 'html-elements',
+                name: 'Các phần tử HTML',
+                chapter: 'html-intro',
+                description: 'Tìm hiểu về các thẻ HTML cơ bản'
+            },
+            {
+                id: 'css-selectors',
+                name: 'Bộ chọn CSS',
+                chapter: 'css-intro',
+                description: 'Các loại bộ chọn trong CSS'
+            },
+            {
+                id: 'js-variables',
+                name: 'Biến và Kiểu dữ liệu',
+                chapter: 'js-syntax',
+                description: 'Khai báo biến và các kiểu dữ liệu trong JavaScript'
+            }
+        ];
+
+        const defaultLessons = [
+            {
+                id: 1,
+                name: "Cấu trúc HTML cơ bản",
+                description: "Tìm hiểu về cấu trúc cơ bản của một trang HTML",
+                topic: "html-elements",
+                link: "https://example.com/html-basic-structure",
+                image: "",
+                created: "2024-01-15",
+                updated: "2024-01-15"
+            },
+            {
+                id: 2,
+                name: "CSS Box Model",
+                description: "Hiểu về mô hình hộp trong CSS và cách sử dụng",
+                topic: "css-selectors",
+                link: "https://example.com/css-box-model",
+                image: "",
+                created: "2024-01-20",
+                updated: "2024-01-20"
+            },
+            {
+                id: 3,
+                name: "Biến trong JavaScript",
+                description: "Cách khai báo và sử dụng biến trong JavaScript",
+                topic: "js-variables",
+                link: "https://example.com/js-variables",
+                image: "",
+                created: "2024-01-25",
+                updated: "2024-01-25"
+            }
+        ];
+
+        // Load data from localStorage or use defaults
+        let categories = loadFromStorage(STORAGE_KEYS.CATEGORIES) || defaultCategories;
+        let chapters = loadFromStorage(STORAGE_KEYS.CHAPTERS) || defaultChapters;
+        let topics = loadFromStorage(STORAGE_KEYS.TOPICS) || defaultTopics;
+        let lessons = loadFromStorage(STORAGE_KEYS.LESSONS) || defaultLessons;
+
+        // DOM Elements
+        const categoryList = document.getElementById('categoryList');
+        const samplesGrid = document.getElementById('samplesGrid');
+        const categoryName = document.getElementById('categoryName');
+        const samplesCount = document.getElementById('samplesCount');
+        const searchInput = document.getElementById('searchInput');
+        const fabMain = document.getElementById('fabMain');
+        const fabOptions = document.getElementById('fabOptions');
+        const addCategoryModal = document.getElementById('addCategoryModal');
+        const addChapterModal = document.getElementById('addChapterModal');
+        const addTopicModal = document.getElementById('addTopicModal');
+        const lessonModal = document.getElementById('lessonModal');
+        const viewLessonModal = document.getElementById('viewLessonModal');
+        const importModal = document.getElementById('importModal');
+        const lessonTopicSelect = document.getElementById('lessonTopicSelect');
+        const chapterCategorySelect = document.getElementById('chapterCategorySelect');
+        const topicChapterSelect = document.getElementById('topicChapterSelect');
+        const lessonImageInput = document.getElementById('lessonImageInput');
+        const lessonImagePreview = document.getElementById('lessonImagePreview');
+        const lessonImageUrlInput = document.getElementById('lessonImageUrlInput');
+
+        let currentViewLesson = null;
+        let currentEditLessonId = null;
+        let currentLessonImage = null;
+
+        // Storage functions
+        function loadFromStorage(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            } catch (error) {
+                console.error('Error loading from storage:', error);
+                return null;
+            }
+        }
+
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('Error saving to storage:', error);
+                alert('Lỗi khi lưu dữ liệu. Có thể bộ nhớ đã đầy.');
+                return false;
+            }
+        }
+
+        function saveAllData() {
+            saveToStorage(STORAGE_KEYS.CATEGORIES, categories);
+            saveToStorage(STORAGE_KEYS.CHAPTERS, chapters);
+            saveToStorage(STORAGE_KEYS.TOPICS, topics);
+            saveToStorage(STORAGE_KEYS.LESSONS, lessons);
+        }
+
+        function exportData() {
+            const data = {
+                categories: categories,
+                chapters: chapters,
+                topics: topics,
+                lessons: lessons,
+                exportedAt: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `lesson-management-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('Dữ liệu đã được xuất thành công!');
+        }
+
+        function importData() {
+            importModal.classList.add('show');
+        }
+
+        function hideImportModal() {
+            importModal.classList.remove('show');
+            document.getElementById('importDataInput').value = '';
+        }
+
+        function processImport() {
+            const importData = document.getElementById('importDataInput').value.trim();
+            
+            if (!importData) {
+                alert('Vui lòng nhập dữ liệu JSON');
+                return;
+            }
+
+            try {
+                const parsedData = JSON.parse(importData);
+                
+                if (!parsedData.categories || !parsedData.chapters || !parsedData.topics || !parsedData.lessons) {
+                    throw new Error('Dữ liệu không hợp lệ');
+                }
+
+                if (confirm('Bạn có chắc chắn muốn nhập dữ liệu mới? Dữ liệu hiện tại sẽ bị ghi đè!')) {
+                    categories = parsedData.categories;
+                    chapters = parsedData.chapters;
+                    topics = parsedData.topics;
+                    lessons = parsedData.lessons;
+                    saveAllData();
+                    initApp();
+                    hideImportModal();
+                    alert('Nhập dữ liệu thành công!');
+                }
+            } catch (error) {
+                alert('Dữ liệu JSON không hợp lệ: ' + error.message);
+            }
+        }
+
+        function showStorageInfo() {
+            const totalSpace = 5 * 1024 * 1024;
+            let usedSpace = 0;
+            
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    usedSpace += localStorage[key].length * 2;
+                }
+            }
+            
+            const usedPercent = ((usedSpace / totalSpace) * 100).toFixed(1);
+            
+            alert(`Thông tin lưu trữ:\n\n` +
+                  `• Đã sử dụng: ${(usedSpace / 1024).toFixed(1)} KB / ${(totalSpace / 1024).toFixed(0)} KB\n` +
+                  `• Tỷ lệ sử dụng: ${usedPercent}%\n` +
+                  `• Số mục: ${categories.length}\n` +
+                  `• Số chương: ${chapters.length}\n` +
+                  `• Số chủ đề: ${topics.length}\n` +
+                  `• Số bài giảng: ${lessons.length}\n\n` +
+                  `Dữ liệu được lưu trữ cục bộ trên trình duyệt của bạn.`);
+        }
+
+        // Initialize the application
+        function initApp() {
+            updateCategoryCounts();
+            renderCategories();
+            renderLessons('all', 'all');
+            setupEventListeners();
+            populateSelects();
+        }
+
+        // Update lesson counts for each category
+        function updateCategoryCounts() {
+            categories.forEach(category => {
+                if (category.id === 'all') {
+                    category.count = lessons.length;
+                } else {
+                    // Get all chapters in this category
+                    const categoryChapters = chapters.filter(chapter => chapter.category === category.id);
+                    // Get all topics in these chapters
+                    const categoryTopics = topics.filter(topic => 
+                        categoryChapters.some(chapter => chapter.id === topic.chapter)
+                    );
+                    // Count lessons in these topics
+                    category.count = lessons.filter(lesson => 
+                        categoryTopics.some(topic => topic.id === lesson.topic)
+                    ).length;
+                }
+            });
+        }
+
+        // Render category list with hierarchy
+        function renderCategories() {
+            categoryList.innerHTML = '';
+            
+            // Add "All Lessons" option
+            const allItem = document.createElement('li');
+            allItem.className = 'category-item active hierarchy-level-1';
+            allItem.dataset.category = 'all';
+            allItem.innerHTML = `
+                <i class="fas fa-th-large"></i>
+                <span>Tất cả bài giảng</span>
+                <span class="category-count">${categories.find(c => c.id === 'all').count}</span>
+            `;
+            categoryList.appendChild(allItem);
+            
+            // Render categories with their chapters and topics
+            categories.forEach(category => {
+                if (category.id === 'all') return;
+                
+                const categoryItem = document.createElement('li');
+                categoryItem.className = 'category-item hierarchy-level-1';
+                categoryItem.dataset.category = category.id;
+                categoryItem.innerHTML = `
+                    <i class="${category.icon}"></i>
+                    <span>${category.name}</span>
+                    <span class="category-count">${category.count}</span>
+                    <button class="category-delete" onclick="deleteCategory('${category.id}')"><i class="fas fa-times"></i></button>
+                `;
+                categoryList.appendChild(categoryItem);
+                
+                // Add chapters for this category
+                const categoryChapters = chapters.filter(chapter => chapter.category === category.id);
+                if (categoryChapters.length > 0) {
+                    const chapterList = document.createElement('ul');
+                    chapterList.className = 'chapter-list';
+                    
+                    categoryChapters.forEach(chapter => {
+                        const chapterItem = document.createElement('li');
+                        chapterItem.className = 'chapter-item hierarchy-level-2';
+                        chapterItem.dataset.chapter = chapter.id;
+                        chapterItem.innerHTML = `
+                            <i class="fas fa-folder"></i>
+                            <span>${chapter.name}</span>
+                            <button class="category-delete" onclick="deleteChapter('${chapter.id}')"><i class="fas fa-times"></i></button>
+                        `;
+                        chapterList.appendChild(chapterItem);
+                        
+                        // Add topics for this chapter
+                        const chapterTopics = topics.filter(topic => topic.chapter === chapter.id);
+                        if (chapterTopics.length > 0) {
+                            const topicList = document.createElement('ul');
+                            topicList.className = 'topic-list';
+                            
+                            chapterTopics.forEach(topic => {
+                                const topicItem = document.createElement('li');
+                                topicItem.className = 'topic-item hierarchy-level-3';
+                                topicItem.dataset.topic = topic.id;
+                                topicItem.innerHTML = `
+                                    <i class="fas fa-file"></i>
+                                    <span>${topic.name}</span>
+                                    <button class="category-delete" onclick="deleteTopic('${topic.id}')"><i class="fas fa-times"></i></button>
+                                `;
+                                topicList.appendChild(topicItem);
+                            });
+                            
+                            chapterItem.appendChild(topicList);
+                        }
+                    });
+                    
+                    categoryItem.appendChild(chapterList);
+                }
+            });
+        }
+
+        // Render lessons grid
+        function renderLessons(categoryId, contentType = 'all', searchTerm = '') {
+            let filteredLessons = lessons;
+            
+            // Filter by category
+            if (categoryId !== 'all') {
+                // Get all chapters in this category
+                const categoryChapters = chapters.filter(chapter => chapter.category === categoryId);
+                // Get all topics in these chapters
+                const categoryTopics = topics.filter(topic => 
+                    categoryChapters.some(chapter => chapter.id === topic.chapter)
+                );
+                // Filter lessons by these topics
+                filteredLessons = filteredLessons.filter(lesson => 
+                    categoryTopics.some(topic => topic.id === lesson.topic)
+                );
+            }
+            
+            // Filter by search term
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredLessons = filteredLessons.filter(lesson => 
+                    lesson.name.toLowerCase().includes(term) || 
+                    lesson.description.toLowerCase().includes(term) ||
+                    lesson.link.toLowerCase().includes(term)
+                );
+            }
+            
+            // Update UI
+            const currentCategory = categories.find(cat => cat.id === categoryId);
+            categoryName.textContent = currentCategory.name;
+            samplesCount.textContent = filteredLessons.length;
+            
+            // Render lesson cards
+            samplesGrid.innerHTML = '';
+            
+            if (filteredLessons.length === 0) {
+                samplesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book"></i>
+                        <h3>Không tìm thấy bài giảng nào</h3>
+                        <p>Hãy thử tìm kiếm với từ khóa khác hoặc chọn danh mục khác</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredLessons.forEach(lesson => {
+                const topic = topics.find(t => t.id === lesson.topic);
+                const chapter = chapters.find(c => c.id === topic.chapter);
+                const category = categories.find(c => c.id === chapter.category);
+                
+                const lessonCard = document.createElement('div');
+                lessonCard.className = 'sample-card';
+                
+                // Create image preview
+                let imageHtml = '';
+                if (lesson.image) {
+                    imageHtml = `<div class="lesson-image"><img src="${lesson.image}" alt="${lesson.name}"></div>`;
+                } else {
+                    imageHtml = `<div class="lesson-image"><span>Không có hình ảnh</span></div>`;
+                }
+                
+                lessonCard.innerHTML = `
+                    <button class="delete-btn" onclick="deleteLesson(${lesson.id})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    ${imageHtml}
+                    <div class="sample-header">
+                        <h3 class="sample-name">${lesson.name}</h3>
+                        <div class="sample-actions">
+                            <button class="sample-action" onclick="viewLesson(${lesson.id})" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="sample-action" onclick="editLesson(${lesson.id})" title="Chỉnh sửa">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="sample-action" onclick="openLessonLink(${lesson.id})" title="Mở bài giảng">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="sample-meta">
+                        <div class="sample-meta-item">
+                            <i class="fas fa-folder"></i>
+                            <span>${category.name}</span>
+                        </div>
+                        <div class="sample-meta-item">
+                            <i class="fas fa-folder-open"></i>
+                            <span>${chapter.name}</span>
+                        </div>
+                        <div class="sample-meta-item">
+                            <i class="fas fa-file"></i>
+                            <span>${topic.name}</span>
+                        </div>
+                    </div>
+                    <div class="sample-description">
+                        ${lesson.description || 'Không có mô tả'}
+                    </div>
+                    <a href="${lesson.link}" target="_blank" class="sample-link">
+                        <i class="fas fa-external-link-alt"></i> Mở bài giảng
+                    </a>
+                `;
+                samplesGrid.appendChild(lessonCard);
+            });
+        }
+
+        // View lesson details
+        function viewLesson(lessonId) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (!lesson) return;
+
+            currentViewLesson = lesson;
+            
+            const topic = topics.find(t => t.id === lesson.topic);
+            const chapter = chapters.find(c => c.id === topic.chapter);
+            const category = categories.find(c => c.id === chapter.category);
+            
+            document.getElementById('viewLessonTitle').textContent = lesson.name;
+            
+            // Set image preview
+            const viewLessonImage = document.getElementById('viewLessonImage');
+            if (lesson.image) {
+                viewLessonImage.innerHTML = `<img src="${lesson.image}" alt="${lesson.name}">`;
+            } else {
+                viewLessonImage.innerHTML = '<span>Không có hình ảnh</span>';
+            }
+            
+            document.getElementById('viewLessonName').textContent = lesson.name;
+            document.getElementById('viewLessonTopic').textContent = `${category.name} > ${chapter.name} > ${topic.name}`;
+            document.getElementById('viewLessonDescription').textContent = lesson.description || 'Không có mô tả';
+            document.getElementById('viewLessonLink').innerHTML = `<a href="${lesson.link}" target="_blank">${lesson.link}</a>`;
+            
+            viewLessonModal.classList.add('show');
+        }
+
+        function hideViewLessonModal() {
+            viewLessonModal.classList.remove('show');
+            currentViewLesson = null;
+        }
+
+        // Open lesson link
+        function openLessonLink(lessonId = null) {
+            const lesson = lessonId ? lessons.find(l => l.id === lessonId) : currentViewLesson;
+            if (!lesson) return;
+
+            window.open(lesson.link, '_blank');
+        }
+
+        // Edit lesson
+        function editLesson(lessonId) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (!lesson) return;
+
+            currentEditLessonId = lessonId;
+            
+            // Fill form with lesson data
+            document.getElementById('lessonModalTitle').textContent = 'Chỉnh sửa bài giảng';
+            document.getElementById('lessonNameInput').value = lesson.name;
+            document.getElementById('lessonTopicSelect').value = lesson.topic;
+            document.getElementById('lessonDescriptionInput').value = lesson.description || '';
+            document.getElementById('lessonLinkInput').value = lesson.link;
+            document.getElementById('lessonImageUrlInput').value = lesson.image || '';
+            document.getElementById('saveLessonBtn').textContent = 'Cập nhật bài giảng';
+            
+            // Set image preview
+            if (lesson.image) {
+                lessonImagePreview.innerHTML = `<img src="${lesson.image}" alt="${lesson.name}">`;
+            } else {
+                lessonImagePreview.innerHTML = '<span>Chưa có hình ảnh</span>';
+            }
+            
+            lessonModal.classList.add('show');
+        }
+
+        // Save lesson (add new or update existing)
+        function saveLesson() {
+            const name = document.getElementById('lessonNameInput').value.trim();
+            const topic = document.getElementById('lessonTopicSelect').value;
+            const description = document.getElementById('lessonDescriptionInput').value.trim();
+            const link = document.getElementById('lessonLinkInput').value.trim();
+            const imageUrl = document.getElementById('lessonImageUrlInput').value.trim();
+
+            if (!name || !topic || !link) {
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+                return;
+            }
+
+            if (!link.startsWith('http://') && !link.startsWith('https://')) {
+                alert('Vui lòng nhập đường link hợp lệ (bắt đầu với http:// hoặc https://)');
+                return;
+            }
+
+            // Use uploaded image if available, otherwise use URL
+            const image = currentLessonImage || imageUrl;
+
+            if (currentEditLessonId) {
+                // Update existing lesson
+                const lessonIndex = lessons.findIndex(l => l.id === currentEditLessonId);
+                if (lessonIndex !== -1) {
+                    lessons[lessonIndex] = {
+                        ...lessons[lessonIndex],
+                        name: name,
+                        description: description,
+                        topic: topic,
+                        link: link,
+                        image: image,
+                        updated: new Date().toISOString().split('T')[0]
+                    };
+                    
+                    alert('Cập nhật bài giảng thành công!');
+                }
+            } else {
+                // Add new lesson
+                const newLesson = {
+                    id: Date.now(),
+                    name: name,
+                    description: description,
+                    topic: topic,
+                    link: link,
+                    image: image,
+                    created: new Date().toISOString().split('T')[0],
+                    updated: new Date().toISOString().split('T')[0]
+                };
+
+                lessons.push(newLesson);
+                alert('Thêm bài giảng thành công!');
+            }
+
+            updateCategoryCounts();
+            renderCategories();
+            saveAllData();
+            
+            const activeCategory = document.querySelector('.category-item.active');
+            const categoryId = activeCategory ? activeCategory.dataset.category : 'all';
+            const activeFilter = document.querySelector('.filter-option.active');
+            const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+            renderLessons(categoryId, contentType, searchInput.value);
+            
+            hideLessonModal();
+            resetLessonForm();
+        }
+
+        // Reset lesson form
+        function resetLessonForm() {
+            document.getElementById('lessonNameInput').value = '';
+            document.getElementById('lessonDescriptionInput').value = '';
+            document.getElementById('lessonLinkInput').value = '';
+            document.getElementById('lessonImageUrlInput').value = '';
+            lessonImagePreview.innerHTML = '<span>Chưa có hình ảnh</span>';
+            currentLessonImage = null;
+        }
+
+        // Delete lesson
+        function deleteLesson(lessonId) {
+            if (confirm('Bạn có chắc chắn muốn xóa bài giảng này?')) {
+                lessons = lessons.filter(lesson => lesson.id !== lessonId);
+                updateCategoryCounts();
+                renderCategories();
+                saveAllData();
+                
+                const activeCategory = document.querySelector('.category-item.active');
+                const categoryId = activeCategory ? activeCategory.dataset.category : 'all';
+                const activeFilter = document.querySelector('.filter-option.active');
+                const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+                renderLessons(categoryId, contentType, searchInput.value);
+            }
+        }
+
+        // Delete category
+        function deleteCategory(categoryId) {
+            if (categoryId === 'all') return;
+            
+            // Get all chapters in this category
+            const categoryChapters = chapters.filter(chapter => chapter.category === categoryId);
+            // Get all topics in these chapters
+            const categoryTopics = topics.filter(topic => 
+                categoryChapters.some(chapter => chapter.id === topic.chapter)
+            );
+            // Get all lessons in these topics
+            const categoryLessons = lessons.filter(lesson => 
+                categoryTopics.some(topic => topic.id === lesson.topic)
+            );
+            
+            if (categoryLessons.length > 0) {
+                if (!confirm(`Mục này có ${categoryLessons.length} bài giảng. Tất cả sẽ bị xóa. Bạn có chắc chắn?`)) {
+                    return;
+                }
+                // Remove lessons
+                lessons = lessons.filter(lesson => 
+                    !categoryTopics.some(topic => topic.id === lesson.topic)
+                );
+            }
+            
+            // Remove topics
+            topics = topics.filter(topic => 
+                !categoryChapters.some(chapter => chapter.id === topic.chapter)
+            );
+            
+            // Remove chapters
+            chapters = chapters.filter(chapter => chapter.category !== categoryId);
+            
+            // Remove category
+            categories = categories.filter(category => category.id !== categoryId);
+            
+            updateCategoryCounts();
+            renderCategories();
+            populateSelects();
+            saveAllData();
+            
+            renderLessons('all', 'all', searchInput.value);
+        }
+
+        // Delete chapter
+        function deleteChapter(chapterId) {
+            // Get all topics in this chapter
+            const chapterTopics = topics.filter(topic => topic.chapter === chapterId);
+            // Get all lessons in these topics
+            const chapterLessons = lessons.filter(lesson => 
+                chapterTopics.some(topic => topic.id === lesson.topic)
+            );
+            
+            if (chapterLessons.length > 0) {
+                if (!confirm(`Chương này có ${chapterLessons.length} bài giảng. Tất cả sẽ bị xóa. Bạn có chắc chắn?`)) {
+                    return;
+                }
+                // Remove lessons
+                lessons = lessons.filter(lesson => 
+                    !chapterTopics.some(topic => topic.id === lesson.topic)
+                );
+            }
+            
+            // Remove topics
+            topics = topics.filter(topic => topic.chapter !== chapterId);
+            
+            // Remove chapter
+            chapters = chapters.filter(chapter => chapter.id !== chapterId);
+            
+            updateCategoryCounts();
+            renderCategories();
+            populateSelects();
+            saveAllData();
+            
+            const activeCategory = document.querySelector('.category-item.active');
+            const categoryId = activeCategory ? activeCategory.dataset.category : 'all';
+            const activeFilter = document.querySelector('.filter-option.active');
+            const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+            renderLessons(categoryId, contentType, searchInput.value);
+        }
+
+        // Delete topic
+        function deleteTopic(topicId) {
+            // Get all lessons in this topic
+            const topicLessons = lessons.filter(lesson => lesson.topic === topicId);
+            
+            if (topicLessons.length > 0) {
+                if (!confirm(`Chủ đề này có ${topicLessons.length} bài giảng. Tất cả sẽ bị xóa. Bạn có chắc chắn?`)) {
+                    return;
+                }
+                // Remove lessons
+                lessons = lessons.filter(lesson => lesson.topic !== topicId);
+            }
+            
+            // Remove topic
+            topics = topics.filter(topic => topic.id !== topicId);
+            
+            updateCategoryCounts();
+            renderCategories();
+            populateSelects();
+            saveAllData();
+            
+            const activeCategory = document.querySelector('.category-item.active');
+            const categoryId = activeCategory ? activeCategory.dataset.category : 'all';
+            const activeFilter = document.querySelector('.filter-option.active');
+            const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+            renderLessons(categoryId, contentType, searchInput.value);
+        }
+
+        // Populate all select elements
+        function populateSelects() {
+            // Populate lesson topic select
+            lessonTopicSelect.innerHTML = '';
+            topics.forEach(topic => {
+                const chapter = chapters.find(c => c.id === topic.chapter);
+                const category = categories.find(c => c.id === chapter.category);
+                const option = document.createElement('option');
+                option.value = topic.id;
+                option.textContent = `${category.name} > ${chapter.name} > ${topic.name}`;
+                lessonTopicSelect.appendChild(option);
+            });
+
+            // Populate chapter category select
+            chapterCategorySelect.innerHTML = '';
+            categories.forEach(category => {
+                if (category.id !== 'all') {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    chapterCategorySelect.appendChild(option);
+                }
+            });
+
+            // Populate topic chapter select
+            topicChapterSelect.innerHTML = '';
+            chapters.forEach(chapter => {
+                const category = categories.find(c => c.id === chapter.category);
+                const option = document.createElement('option');
+                option.value = chapter.id;
+                option.textContent = `${category.name} > ${chapter.name}`;
+                topicChapterSelect.appendChild(option);
+            });
+        }
+
+        // FAB functionality
+        function toggleFabOptions() {
+            fabOptions.classList.toggle('show');
+        }
+
+        // Category modal functions
+        function showAddCategoryModal() {
+            addCategoryModal.classList.add('show');
+            fabOptions.classList.remove('show');
+        }
+
+        function hideAddCategoryModal() {
+            addCategoryModal.classList.remove('show');
+            document.getElementById('categoryNameInput').value = '';
+            document.getElementById('categoryDescriptionInput').value = '';
+        }
+
+        function addNewCategory() {
+            const categoryName = document.getElementById('categoryNameInput').value.trim();
+            const categoryDescription = document.getElementById('categoryDescriptionInput').value.trim();
+            
+            if (!categoryName) {
+                alert('Vui lòng nhập tên mục');
+                return;
+            }
+
+            if (categories.some(cat => cat.name.toLowerCase() === categoryName.toLowerCase())) {
+                alert('Tên mục đã tồn tại');
+                return;
+            }
+
+            const newCategory = {
+                id: 'category-' + Date.now(),
+                name: categoryName,
+                description: categoryDescription,
+                icon: 'fas fa-folder',
+                count: 0
+            };
+
+            categories.push(newCategory);
+            renderCategories();
+            populateSelects();
+            saveAllData();
+            hideAddCategoryModal();
+            
+            alert('Thêm mục thành công!');
+        }
+
+        // Chapter modal functions
+        function showAddChapterModal() {
+            addChapterModal.classList.add('show');
+            fabOptions.classList.remove('show');
+        }
+
+        function hideAddChapterModal() {
+            addChapterModal.classList.remove('show');
+            document.getElementById('chapterNameInput').value = '';
+            document.getElementById('chapterDescriptionInput').value = '';
+        }
+
+        function addNewChapter() {
+            const chapterName = document.getElementById('chapterNameInput').value.trim();
+            const chapterCategory = document.getElementById('chapterCategorySelect').value;
+            const chapterDescription = document.getElementById('chapterDescriptionInput').value.trim();
+            
+            if (!chapterName || !chapterCategory) {
+                alert('Vui lòng điền đầy đủ thông tin');
+                return;
+            }
+
+            const newChapter = {
+                id: 'chapter-' + Date.now(),
+                name: chapterName,
+                category: chapterCategory,
+                description: chapterDescription
+            };
+
+            chapters.push(newChapter);
+            renderCategories();
+            populateSelects();
+            saveAllData();
+            hideAddChapterModal();
+            
+            alert('Thêm chương thành công!');
+        }
+
+        // Topic modal functions
+        function showAddTopicModal() {
+            addTopicModal.classList.add('show');
+            fabOptions.classList.remove('show');
+        }
+
+        function hideAddTopicModal() {
+            addTopicModal.classList.remove('show');
+            document.getElementById('topicNameInput').value = '';
+            document.getElementById('topicDescriptionInput').value = '';
+        }
+
+        function addNewTopic() {
+            const topicName = document.getElementById('topicNameInput').value.trim();
+            const topicChapter = document.getElementById('topicChapterSelect').value;
+            const topicDescription = document.getElementById('topicDescriptionInput').value.trim();
+            
+            if (!topicName || !topicChapter) {
+                alert('Vui lòng điền đầy đủ thông tin');
+                return;
+            }
+
+            const newTopic = {
+                id: 'topic-' + Date.now(),
+                name: topicName,
+                chapter: topicChapter,
+                description: topicDescription
+            };
+
+            topics.push(newTopic);
+            renderCategories();
+            populateSelects();
+            saveAllData();
+            hideAddTopicModal();
+            
+            alert('Thêm chủ đề thành công!');
+        }
+
+        // Lesson modal functions
+        function showAddLessonModal() {
+            currentEditLessonId = null;
+            document.getElementById('lessonModalTitle').textContent = 'Thêm bài giảng mới';
+            document.getElementById('saveLessonBtn').textContent = 'Thêm bài giảng';
+            
+            // Reset form
+            resetLessonForm();
+            
+            lessonModal.classList.add('show');
+            fabOptions.classList.remove('show');
+        }
+
+        function hideLessonModal() {
+            lessonModal.classList.remove('show');
+            currentEditLessonId = null;
+            resetLessonForm();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Category click event
+            categoryList.addEventListener('click', (e) => {
+                const categoryItem = e.target.closest('.category-item');
+                const chapterItem = e.target.closest('.chapter-item');
+                const topicItem = e.target.closest('.topic-item');
+                
+                if (categoryItem && !chapterItem && !topicItem) {
+                    document.querySelectorAll('.category-item, .chapter-item, .topic-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    categoryItem.classList.add('active');
+                    
+                    const categoryId = categoryItem.dataset.category;
+                    const activeFilter = document.querySelector('.filter-option.active');
+                    const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+                    renderLessons(categoryId, contentType, searchInput.value);
+                }
+                
+                if (chapterItem) {
+                    document.querySelectorAll('.category-item, .chapter-item, .topic-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    chapterItem.classList.add('active');
+                    
+                    // Get the category of this chapter
+                    const chapter = chapters.find(c => c.id === chapterItem.dataset.chapter);
+                    const categoryId = chapter ? chapter.category : 'all';
+                    const activeFilter = document.querySelector('.filter-option.active');
+                    const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+                    renderLessons(categoryId, contentType, searchInput.value);
+                }
+                
+                if (topicItem) {
+                    document.querySelectorAll('.category-item, .chapter-item, .topic-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    topicItem.classList.add('active');
+                    
+                    // Get the category of this topic
+                    const topic = topics.find(t => t.id === topicItem.dataset.topic);
+                    const chapter = chapters.find(c => c.id === topic.chapter);
+                    const categoryId = chapter ? chapter.category : 'all';
+                    const activeFilter = document.querySelector('.filter-option.active');
+                    const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+                    renderLessons(categoryId, contentType, searchInput.value);
+                }
+            });
+
+            // Filter option click event
+            document.querySelectorAll('.filter-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    option.classList.add('active');
+                    
+                    const contentType = option.dataset.type;
+                    const activeCategory = document.querySelector('.category-item.active');
+                    const categoryId = activeCategory ? activeCategory.dataset.category : 'all';
+                    renderLessons(categoryId, contentType, searchInput.value);
+                });
+            });
+
+            // Search input event
+            searchInput.addEventListener('input', (e) => {
+                const activeCategory = document.querySelector('.category-item.active');
+                const categoryId = activeCategory ? activeCategory.dataset.category : 'all';
+                const activeFilter = document.querySelector('.filter-option.active');
+                const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+                renderLessons(categoryId, contentType, e.target.value);
+            });
+
+            // FAB click event
+            fabMain.addEventListener('click', toggleFabOptions);
+
+            // Image upload event
+            lessonImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        currentLessonImage = event.target.result;
+                        lessonImagePreview.innerHTML = `<img src="${currentLessonImage}" alt="Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Image URL input event
+            lessonImageUrlInput.addEventListener('input', function(e) {
+                const url = e.target.value.trim();
+                if (url) {
+                    // Create a new image to test if the URL is valid
+                    const img = new Image();
+                    img.onload = function() {
+                        lessonImagePreview.innerHTML = `<img src="${url}" alt="Preview">`;
+                        currentLessonImage = url;
+                    };
+                    img.onerror = function() {
+                        lessonImagePreview.innerHTML = '<span>URL hình ảnh không hợp lệ</span>';
+                        currentLessonImage = null;
+                    };
+                    img.src = url;
+                } else {
+                    lessonImagePreview.innerHTML = '<span>Chưa có hình ảnh</span>';
+                    currentLessonImage = null;
+                }
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === addCategoryModal) hideAddCategoryModal();
+                if (e.target === addChapterModal) hideAddChapterModal();
+                if (e.target === addTopicModal) hideAddTopicModal();
+                if (e.target === lessonModal) hideLessonModal();
+                if (e.target === viewLessonModal) hideViewLessonModal();
+                if (e.target === importModal) hideImportModal();
+            });
+
+            // Close FAB options when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!fabMain.contains(e.target) && !fabOptions.contains(e.target)) {
+                    fabOptions.classList.remove('show');
+                }
+            });
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
